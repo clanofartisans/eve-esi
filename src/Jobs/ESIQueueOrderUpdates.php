@@ -37,9 +37,4 @@ class ESIQueueOrderUpdates extends ESIJob
 
         $handler->queueOrderUpdates($this->region);
     }
-
-    public function middleware()
-    {
-        return [(new WithoutOverlapping($this->region))->dontRelease()];
-    }
 }

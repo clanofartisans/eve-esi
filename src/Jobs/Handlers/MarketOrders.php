@@ -12,6 +12,7 @@ use Clanofartisans\EveEsi\Models\ESITableUpdates;
 use Clanofartisans\EveEsi\Models\MarketOrder;
 use Clanofartisans\EveEsi\Routes\InvalidESIResponseException;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Cache;
 use Throwable;
 
 class MarketOrders extends ESIHandler
@@ -67,6 +68,20 @@ class MarketOrders extends ESIHandler
     }
 
     /**
+     * Handles cleanup and any special post-processing after the data has been upserted.
+     *
+     * @param string $section
+     * @return void
+     */
+    public function postProcessing(string $section = '*'): void
+    {
+        $this->cleanupTableUpdates($section);
+
+        $lock = Cache::lock($this->updateTable . ':' . $section);
+        $lock->forceRelease();
+    }
+
+    /**
      *
      *
      * @param int $region
@@ -75,22 +90,27 @@ class MarketOrders extends ESIHandler
      */
     public function queueOrderUpdates(int $region): void
     {
-        $this->cleanupTableUpdates($region);
+        $lock = Cache::lock($this->updateTable . ':' . $region, 600);
+        if($lock->get()) {
+            $this->cleanupTableUpdates($region);
 
-        $pages = ESI::markets()->region($region)->orders()->getNumPages();
+            $pages = ESI::markets()->region($region)->orders()->getNumPages();
 
-        $batch = [];
-        for($i = 1; $i <= $pages; $i++) {
-            $batch[] = new ESIUpdateOrders($region, $i);
+            $batch = [];
+            for($i = 1; $i <= $pages; $i++) {
+                $batch[] = new ESIUpdateOrders($region, $i);
+            }
+
+            $handler = $this::class;
+            $section = (string) $region;
+
+            Bus::batch($batch)
+                ->then(function () use ($handler, $section) {
+                    ESIProcessRawData::dispatch($handler, $section);
+                })->dispatch();
+        } else {
+            logger('Unable to queue update "'.$this->updateTable . ':' . $region . '" because of a lock.');
         }
-
-        $handler = $this::class;
-        $section = (string) $region;
-
-        Bus::batch($batch)
-            ->then(function () use ($handler, $section) {
-                ESIProcessRawData::dispatch($handler, $section);
-            })->dispatch();
     }
 
     /**
