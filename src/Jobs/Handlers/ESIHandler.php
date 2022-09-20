@@ -172,6 +172,8 @@ abstract class ESIHandler
         $model = new $this->dataModel;
 
         $model->createFromJson($update->data_id, $update->data, $update->hash);
+
+        $update->delete();
     }
 
     /**

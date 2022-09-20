@@ -135,6 +135,8 @@ class MarketOrders extends ESIHandler
         $model = new $this->dataModel;
 
         $model->createFromJson($update->data_id, $data, $update->hash);
+
+        $update->delete();
     }
 
     /**
