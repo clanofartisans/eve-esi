@@ -3,6 +3,7 @@
 namespace Clanofartisans\EveEsi\Jobs;
 
 use Clanofartisans\EveEsi\Jobs\Handlers\MarketOrders;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Throwable;
 
 class ESIQueueOrderUpdates extends ESIJob
@@ -35,5 +36,10 @@ class ESIQueueOrderUpdates extends ESIJob
         $handler = new MarketOrders;
 
         $handler->queueOrderUpdates($this->region);
+    }
+
+    public function middleware()
+    {
+        return [(new WithoutOverlapping($this->region))->dontRelease()];
     }
 }
