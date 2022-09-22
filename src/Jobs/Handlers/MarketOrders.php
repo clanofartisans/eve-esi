@@ -4,12 +4,15 @@ namespace Clanofartisans\EveEsi\Jobs\Handlers;
 
 use Clanofartisans\EveEsi\Auth\RefreshTokenException;
 use Clanofartisans\EveEsi\Facades\EveESI as ESI;
-use Clanofartisans\EveEsi\Jobs\ESIPostProcessing;
-use Clanofartisans\EveEsi\Jobs\ESIProcessRawData;
-use Clanofartisans\EveEsi\Jobs\ESIUpdateOrders;
+use Clanofartisans\EveEsi\Jobs\ESIBatchFetchData;
+use Clanofartisans\EveEsi\Jobs\ESIBatchUpsertData;
+use Clanofartisans\EveEsi\Jobs\ESIFetchData;
+use Clanofartisans\EveEsi\Jobs\ESIPruneData;
+use Clanofartisans\EveEsi\Jobs\ESISpecialData;
 use Clanofartisans\EveEsi\Jobs\ESIUpsertLoader;
 use Clanofartisans\EveEsi\Models\ESITableUpdates;
 use Clanofartisans\EveEsi\Models\MarketOrder;
+use Clanofartisans\EveEsi\Routes\ESIRoute;
 use Clanofartisans\EveEsi\Routes\InvalidESIResponseException;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Cache;
@@ -17,12 +20,6 @@ use Throwable;
 
 class MarketOrders extends ESIHandler
 {
-    /**
-     * The internal name of the table associated with this handler.
-     *
-     * @var string
-     */
-    public string $updateTable = 'market_orders';
 
     /**
      * The Eloquent model associated with this handler.
@@ -32,151 +29,267 @@ class MarketOrders extends ESIHandler
     public string $dataModel = MarketOrder::class;
 
     /**
+     * The name of the ID field as retrieved from ESI.
      *
+     * @var string
+     */
+    public string $esiIDName = 'order_id';
+
+    /**
+     * The logical section used for the job data.
+     *
+     * @var string
+     */
+    public string $section = '*';
+
+    /**
+     * The internal name of the table associated with this handler.
+     *
+     * @var string
+     */
+    public string $updateTable = 'market_orders';
+
+    /**
+     * New
      *
      * @param string $section
      * @return void
      */
-    public function deleteOldResources(string $section = '*'): void
+    public function update(string $section = '*'): void
+    {
+        $this->section = $section;
+
+        if(!$this->lock()) {
+            logger('Unable to queue update "'. $this->name() . '" because of a lock.');
+            return;
+        }
+
+        $this->clearTableUpdates();
+
+        ESIBatchFetchData::dispatch($this::class, $this->section);
+        // Then ESIPruneData
+        // Then ESIBatchUpsertData
+        // Then ESISpecialData
+    }
+
+    /**
+     * New
+     *
+     * @param string $section
+     * @return void
+     */
+    public function specialData(string $section): void
+    {
+        $this->section = $section;
+
+        Cache::lock($this->name())->forceRelease();
+    }
+
+    /**
+     * New
+     *
+     * @return array
+     */
+    protected function buildUpsertBatch(): array
+    {
+        return [new ESIUpsertLoader($this::class, $this->section)];
+    }
+
+    /**
+     * New
+     *
+     * @param string $section
+     * @param array $ids
+     * @return void
+     */
+    public function upsertData(string $section, array $ids): void
+    {
+        $updates = ESITableUpdates::whereIntegerInRaw('id', $ids)
+            ->get(['data_id', 'data', 'hash']);
+
+        $model = new $this->dataModel;
+
+        $model->createFromJson($section, $updates);
+
+        ESITableUpdates::whereIntegerInRaw('id', $ids)
+            ->delete();
+    }
+
+    /**
+     * New
+     *
+     * @param string $section
+     * @return void
+     */
+    public function pruneData(string $section): void
+    {
+        $this->section = $section;
+
+        $this->deleteOldData();
+        $this->ignoreCurrentData();
+
+        ESIBatchUpsertData::dispatch($this::class, $this->section);
+    }
+
+    /**
+     * New
+     *
+     * @return void
+     */
+    protected function deleteOldData(): void
     {
         $model = new $this->dataModel;
         $table = $model->getTable();
         $key = $model->getKeyName();
 
-        $model->where('region_id', $section)
+        $model->whereSection($this->section)
             ->join('esi_table_updates', $table.'.'.$key, '=', 'esi_table_updates.data_id', 'left outer')
             ->whereNull('esi_table_updates.data_id')
             ->delete();
     }
 
     /**
-     * Removes all up-to-date records for the handler from Table Updates.
+     * New
      *
-     * @param string $section
      * @return void
      */
-    public function ignoreCurrentResources(string $section = '*'): void
+    protected function ignoreCurrentData(): void
     {
         $model = new $this->dataModel;
         $table = $model->getTable();
 
         ESITableUpdates::join($table, $table.'.hash', '=', 'esi_table_updates.hash', 'left outer')
             ->where('esi_table_updates.table', $this->updateTable)
-            ->where('esi_table_updates.section', $section)
+            ->where('esi_table_updates.section', $this->section)
             ->whereNotNull($table.'.hash')
             ->delete();
     }
 
     /**
-     * Handles cleanup and any special post-processing after the data has been upserted.
+     * New
      *
      * @param string $section
-     * @return void
-     */
-    public function postProcessing(string $section = '*'): void
-    {
-        $this->cleanupTableUpdates($section);
-
-        $lock = Cache::lock($this->updateTable . ':' . $section);
-        $lock->forceRelease();
-    }
-
-    /**
-     *
-     *
-     * @param int $region
-     * @return void
-     * @throws Throwable
-     */
-    public function queueOrderUpdates(int $region): void
-    {
-        $lock = Cache::lock($this->updateTable . ':' . $region, 600);
-        if($lock->get()) {
-            $this->cleanupTableUpdates($region);
-
-            $pages = ESI::markets()->region($region)->orders()->getNumPages();
-
-            $batch = [];
-            for($i = 1; $i <= $pages; $i++) {
-                $batch[] = new ESIUpdateOrders($region, $i);
-            }
-
-            $handler = $this::class;
-            $section = (string) $region;
-
-            Bus::batch($batch)
-                ->then(function () use ($handler, $section) {
-                    ESIProcessRawData::dispatch($handler, $section);
-                })->dispatch();
-        } else {
-            logger('Unable to queue update "'.$this->updateTable . ':' . $region . '" because of a lock.');
-        }
-    }
-
-    /**
-     *
-     *
-     * @param int $region
      * @param int $page
      * @return void
-     * @throws RefreshTokenException
      * @throws InvalidESIResponseException
+     * @throws RefreshTokenException
      */
-    public function updateOrders(int $region, int $page): void
+    public function fetchData(string $section, int $page): void
     {
-        $orders = ESI::markets()->region($region)->orders()->page($page)->get()->json();
+        $this->section = $section;
 
-        foreach($orders as $order) {
-            $hash = md5(json_encode($order));
+        $data = $this->baseRoute()->page($page)->get()->collect();
 
-            ESITableUpdates::create([
-                'table' => $this->updateTable,
-                'section' => $region,
-                'data_id' => $order['order_id'],
-                'hash' => $hash,
-                'data' => $order
-            ]);
+        foreach($data->chunk(50) as $chunk) {
+            $updates = [];
+            foreach($chunk as $datum) {
+                $hash = md5(json_encode($datum));
+
+                $updates[] = [
+                    'table' => $this->updateTable,
+                    'section' => $this->section,
+                    'data_id' => $datum[$this->esiIDName],
+                    'hash' => $hash,
+                    'data' => json_encode($datum)
+                ];
+            }
+            ESITableUpdates::insert($updates);
         }
     }
 
     /**
-     * Upserts a single resource for the handler from Table Updates.
-     *
-     * @param int $id
-     * @return void
-     */
-    public function upsertNewResource(int $id): void
-    {
-        $update = ESITableUpdates::find($id);
-
-        $data = $update->data;
-        $data['region_id'] = $update->section;
-
-        $model = new $this->dataModel;
-
-        $model->createFromJson($update->data_id, $data, $update->hash);
-
-        $update->delete();
-    }
-
-    /**
-     * Processes the upserts for all data for the handler from Table Updates.
+     * New
      *
      * @param string $section
      * @return void
      * @throws Throwable
      */
-    public function upsertNewResources(string $section = '*'): void
+    public function batchFetchData(string $section): void
     {
-        $loader = new ESIUpsertLoader($this::class, $section);
+        $this->section = $section;
 
-        $handler = $this::class;
+        $batch = $this->buildFetchBatch();
+        Bus::batch($batch)->then(function () {
+            ESIPruneData::dispatch($this::class, $this->section);
+        })->dispatch();
+    }
 
-        Bus::batch([$loader])
-            ->then(function () use ($handler, $section) {
-                ESIPostProcessing::dispatch($handler, $section);
-            })
-            ->allowFailures() // The ESIUpsertLoader can fail and re-run inexplicably on huge datasets. This is a "temporary" fix.
-            ->dispatch();
+    public function batchUpsertData(string $section): void
+    {
+        $this->section = $section;
+
+        $batch = $this->buildUpsertBatch();
+        Bus::batch($batch)->then(function () {
+            ESISpecialData::dispatch($this::class, $this->section);
+        })->dispatch();
+    }
+
+    /**
+     * New
+     *
+     * @return array
+     */
+    protected function buildFetchBatch(): array
+    {
+        $pages = $this->pages();
+        $batch = [];
+        for($i = 1; $i <= $pages; $i++) {
+            $batch[] = new ESIFetchData($this::class, $this->section, $i);
+        }
+
+        return $batch;
+    }
+
+    /**
+     * New
+     *
+     * @return int
+     */
+    protected function pages(): int
+    {
+        return $this->baseRoute()->getNumPages();
+    }
+
+    /**
+     * New - Per Handler
+     *
+     * @return ESIRoute
+     */
+    protected function baseRoute(): ESIRoute
+    {
+        return ESI::markets()->region($this->section)->orders();
+    }
+
+    /**
+     * New
+     *
+     * @return string
+     */
+    protected function name(): string
+    {
+        return $this->updateTable . ':' . $this->section;
+    }
+
+    /**
+     * New
+     *
+     * @return void
+     */
+    protected function clearTableUpdates(): void
+    {
+        ESITableUpdates::where('table', $this->updateTable)
+            ->where('section', $this->section)
+            ->delete();
+    }
+
+    /**
+     * New
+     *
+     * @return bool
+     */
+    protected function lock(): bool
+    {
+        $lock = Cache::lock($this->name(), 600);
+        return $lock->get();
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Clanofartisans\EveEsi\Jobs;
 
-class ESIProcessRawData extends ESIJob
+class ESIBatchFetchData extends ESIJob
 {
     /**
      * The handler class to use for the job.
@@ -12,7 +12,7 @@ class ESIProcessRawData extends ESIJob
     protected string $handler;
 
     /**
-     * The Table Updates section that will be processed.
+     * The logical section used for the job data.
      *
      * @var string
      */
@@ -30,7 +30,7 @@ class ESIProcessRawData extends ESIJob
     }
 
     /**
-     *
+     * New
      *
      * @return void
      */
@@ -38,6 +38,6 @@ class ESIProcessRawData extends ESIJob
     {
         $handler = new $this->handler;
 
-        $handler->processRawData($this->section);
+        $handler->batchFetchData($this->section);
     }
 }

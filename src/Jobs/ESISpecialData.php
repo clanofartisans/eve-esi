@@ -2,7 +2,7 @@
 
 namespace Clanofartisans\EveEsi\Jobs;
 
-class ESIProcessDeletes extends ESIJob
+class ESISpecialData extends ESIJob
 {
     /**
      * The handler class to use for the job.
@@ -12,18 +12,11 @@ class ESIProcessDeletes extends ESIJob
     protected string $handler;
 
     /**
-     * The Table Updates section that will be processed.
+     * The logical section used for the job data.
      *
      * @var string
      */
     protected string $section;
-
-    /**
-     * The number of times the job may be attempted.
-     *
-     * @var int
-     */
-    public int $tries = 1;
 
     /**
      * Create a new job instance.
@@ -37,7 +30,7 @@ class ESIProcessDeletes extends ESIJob
     }
 
     /**
-     *
+     * New
      *
      * @return void
      */
@@ -45,6 +38,6 @@ class ESIProcessDeletes extends ESIJob
     {
         $handler = new $this->handler;
 
-        $handler->deleteOldResources($this->section);
+        $handler->specialData($this->section);
     }
 }

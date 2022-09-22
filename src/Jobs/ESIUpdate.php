@@ -14,13 +14,21 @@ class ESIUpdate extends ESIJob
     protected string $handler;
 
     /**
+     * The logical section used for the job data.
+     *
+     * @var string
+     */
+    protected string $section;
+
+    /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(string $handler)
+    public function __construct(string $handler, string $section = '*')
     {
         $this->handler = $handler;
+        $this->section = $section;
     }
 
     /**
@@ -33,6 +41,6 @@ class ESIUpdate extends ESIJob
     {
         $handler = new $this->handler;
 
-        $handler->updateData();
+        $handler->update($this->section);
     }
 }

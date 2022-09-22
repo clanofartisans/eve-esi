@@ -34,7 +34,7 @@ abstract class ESIJob implements ShouldQueue
     public int $timeout = 300;
 
     /**
-     * Fetch the details for the resource and adds them to the ESI Table Updates table.
+     * New
      *
      * @return void
      */

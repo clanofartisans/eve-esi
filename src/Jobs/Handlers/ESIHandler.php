@@ -3,12 +3,6 @@
 namespace Clanofartisans\EveEsi\Jobs\Handlers;
 
 use Clanofartisans\EveEsi\Auth\RefreshTokenException;
-use Clanofartisans\EveEsi\Jobs\ESIFetchResource;
-use Clanofartisans\EveEsi\Jobs\ESIPostProcessing;
-use Clanofartisans\EveEsi\Jobs\ESIProcessCurrents;
-use Clanofartisans\EveEsi\Jobs\ESIProcessDeletes;
-use Clanofartisans\EveEsi\Jobs\ESIProcessRawData;
-use Clanofartisans\EveEsi\Jobs\ESIProcessUpserts;
 use Clanofartisans\EveEsi\Jobs\ESIUpsertLoader;
 use Clanofartisans\EveEsi\Models\ESITableUpdates;
 use Illuminate\Support\Facades\Bus;

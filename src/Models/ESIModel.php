@@ -2,12 +2,15 @@
 
 namespace Clanofartisans\EveEsi\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 /**
  * @method static int insertOrIgnore(array $values)
  * @method \Illuminate\Database\Eloquent\Model|static updateOrCreate(array $attributes, array $values = [])
+ * @method static int upsert(array $values, $uniqueBy, $update = null)
  * @method static \Illuminate\Database\Eloquent\Builder where($column, $operator = null, $value = null, $boolean = 'and')
  */
 abstract class ESIModel extends Model
@@ -43,12 +46,19 @@ abstract class ESIModel extends Model
     }
 
     /**
-     * Creates a record, or updates an existing record, from JSON data.
+     * New
      *
-     * @param int $id
-     * @param array $data
-     * @param string $hash
-     * @return ESIModel
+     * @param string $section
+     * @param Collection $updates
+     * @return void
      */
-    abstract public function createFromJson(int $id, array $data, string $hash): ESIModel;
+    abstract public function createFromJson(string $section, Collection $updates): void;
+
+    /**
+     * New
+     *
+     * @param string $section
+     * @return Builder $this
+     */
+    abstract public function whereSection(string $section): Builder;
 }

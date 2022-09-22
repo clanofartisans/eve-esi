@@ -4,7 +4,7 @@ namespace Clanofartisans\EveEsi\Jobs;
 
 use Illuminate\Bus\Batchable;
 
-class ESIUpsertNewResource extends ESIJob
+class ESIFetchData extends ESIJob
 {
     use Batchable;
 
@@ -16,36 +16,40 @@ class ESIUpsertNewResource extends ESIJob
     protected string $handler;
 
     /**
-     * The Table Updates ID for the resource we're upserting.
+     * The logical section used for the job data.
+     *
+     * @var string
+     */
+    protected string $section;
+
+    /**
+     * The page to be fetched from ESI.
      *
      * @var int
      */
-    protected int $id;
+    protected int $page;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(string $handler, int $id)
+    public function __construct(string $handler, string $section = '*', int $page = 1)
     {
         $this->handler = $handler;
-        $this->id = $id;
+        $this->section = $section;
+        $this->page = $page;
     }
 
     /**
-     * Upsert the data from Table Updates to the handler's table.
+     * New
      *
      * @return void
      */
     public function handle(): void
     {
-        if($this->batch()->cancelled()) {
-            return;
-        }
-
         $handler = new $this->handler;
 
-        $handler->upsertNewResource($this->id);
+        $handler->fetchData($this->section, $this->page);
     }
 }

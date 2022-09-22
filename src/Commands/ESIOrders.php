@@ -2,7 +2,8 @@
 
 namespace Clanofartisans\EveEsi\Commands;
 
-use Clanofartisans\EveEsi\Jobs\ESIQueueOrderUpdates;
+use Clanofartisans\EveEsi\Jobs\ESIUpdate;
+use Clanofartisans\EveEsi\Jobs\Handlers\MarketOrders;
 use Illuminate\Console\Command;
 
 class ESIOrders extends Command
@@ -28,7 +29,7 @@ class ESIOrders extends Command
      */
     public function handle(): void
     {
-        ESIQueueOrderUpdates::dispatch($this->argument('region'));
+        ESIUpdate::dispatch(MarketOrders::class, $this->argument('region'));
 
         $this->info('Update queued successfully!');
     }

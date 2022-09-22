@@ -4,25 +4,10 @@ namespace Clanofartisans\EveEsi\Jobs;
 
 use Clanofartisans\EveEsi\Models\ESITableUpdates;
 use Illuminate\Bus\Batchable;
-use Throwable;
 
 class ESIUpsertLoader extends ESIJob
 {
     use Batchable;
-
-    /**
-     * The number of seconds the job can run before timing out.
-     *
-     * @var int
-     */
-    public int $timeout = 3600;
-
-    /**
-     * The number of times the job may be attempted.
-     *
-     * @var int
-     */
-    public int $tries = 1;
 
     /**
      * The handler class to use for the job.
@@ -50,7 +35,7 @@ class ESIUpsertLoader extends ESIJob
     }
 
     /**
-     *
+     * New
      *
      * @return void
      */
@@ -58,13 +43,15 @@ class ESIUpsertLoader extends ESIJob
     {
         $handler = new $this->handler;
 
-        ESITableUpdates::where('table', $handler->updateTable)
+        ESITableUpdates::select('id')
+            ->where('table', $handler->updateTable)
             ->where('section', $this->section)
-            ->chunk(500, function ($updates) {
-                $load = [];
+            ->chunkById(50, function ($updates) {
+                $ids = [];
                 foreach($updates as $update) {
-                    $load[] = new ESIUpsertNewResource($this->handler, $update->id);
+                    $ids[] = $update->id;
                 }
+                $load = new ESIUpsertData($this->handler, $this->section, $ids);
                 $this->batch()->add($load);
             });
     }

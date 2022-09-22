@@ -2,7 +2,7 @@
 
 namespace Clanofartisans\EveEsi\Jobs;
 
-class ESIProcessUpserts extends ESIJob
+class ESIPruneData extends ESIJob
 {
     /**
      * The handler class to use for the job.
@@ -12,7 +12,7 @@ class ESIProcessUpserts extends ESIJob
     protected string $handler;
 
     /**
-     * The Table Updates section that will be processed.
+     * The logical section used for the job data.
      *
      * @var string
      */
@@ -30,7 +30,7 @@ class ESIProcessUpserts extends ESIJob
     }
 
     /**
-     *
+     * New
      *
      * @return void
      */
@@ -38,6 +38,6 @@ class ESIProcessUpserts extends ESIJob
     {
         $handler = new $this->handler;
 
-        $handler->upsertNewResources($this->section);
+        $handler->pruneData($this->section);
     }
 }
