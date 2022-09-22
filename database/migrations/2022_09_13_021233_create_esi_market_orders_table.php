@@ -30,9 +30,10 @@ return new class extends Migration
             $table->integer('volume_total');
             $table->char('hash', 32);
 
-            $table->index(['region_id', 'system_id']);
+            $table->index('region_id');
             $table->index('location_id');
             $table->index('type_id');
+            $table->index('hash');
         });
     }
 
