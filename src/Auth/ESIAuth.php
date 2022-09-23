@@ -5,21 +5,24 @@ namespace Clanofartisans\EveEsi\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Http;
 
+/**
+ * @property string $token
+ */
 class ESIAuth extends Model
 {
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'esi_auth';
-
     /**
      * The attributes that aren't mass assignable.
      *
      * @var array
      */
     protected $guarded = [];
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'esi_auth';
 
     /**
      * The ESI URI where auth tokens are refreshed.

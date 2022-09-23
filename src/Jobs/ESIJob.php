@@ -13,18 +13,18 @@ abstract class ESIJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * The number of times the job may be attempted.
-     *
-     * @var int
-     */
-    public int $tries = 3;
-
-    /**
      * The number of seconds to wait before retrying the job.
      *
      * @var int
      */
     public int $backoff = 5;
+
+    /**
+     * The number of times the job may be attempted.
+     *
+     * @var int
+     */
+    public int $tries = 3;
 
     /**
      * The number of seconds the job can run before timing out.
@@ -34,7 +34,7 @@ abstract class ESIJob implements ShouldQueue
     public int $timeout = 300;
 
     /**
-     * New
+     * Process the job.
      *
      * @return void
      */

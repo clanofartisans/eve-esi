@@ -14,18 +14,18 @@ use Illuminate\Support\Facades\Redis;
 abstract class ESIRoute
 {
     /**
+     * The current auth instance that will be used for the request, if applicable.
+     *
+     * @var ESIAuth
+     */
+    protected Model $auth;
+
+    /**
      * The base ESI URI where API calls will be made.
      *
      * @var string
      */
     protected string $baseURI = 'https://esi.evetech.net/latest';
-
-    /**
-     * The name of the current API route.
-     *
-     * @var string
-     */
-    protected string $route = '';
 
     /**
      * The path and query parameters that will be used to build the request.
@@ -35,11 +35,11 @@ abstract class ESIRoute
     protected array $parameters = ['path' => [], 'query' => []];
 
     /**
-     * The current auth instance that will be used for the request, if applicable.
+     * The name of the current API route.
      *
-     * @var ESIAuth
+     * @var string
      */
-    protected Model $auth;
+    protected string $route = '';
 
     /**
      * Adds the current auth instance to the request.
@@ -109,18 +109,6 @@ abstract class ESIRoute
     }
 
     /**
-     * Get the number of pages available for a given ESI resource.
-     *
-     * @return int
-     */
-    public function getNumPages(): int
-    {
-        $response = Http::head($this->uri(), $this->parameters['query']);
-
-        return $response ? (int) $response->header('X-Pages') : 1;
-    }
-
-    /**
      * Retrieves all pages for a given ESI resource.
      *
      * @return array
@@ -141,25 +129,15 @@ abstract class ESIRoute
     }
 
     /**
-     * Detects if the response matched what's in our cache.
+     * Get the number of pages available for a given ESI resource.
      *
-     * @param Response $response
-     * @return bool
+     * @return int
      */
-    protected function isCurrent(Response $response): bool
+    public function getNumPages(): int
     {
-        return $response->status() === 304;
-    }
+        $response = Http::head($this->uri(), $this->parameters['query']);
 
-    /**
-     * Detects if the response is "OK" or not.
-     *
-     * @param Response $response
-     * @return bool
-     */
-    protected function isValid(Response $response): bool
-    {
-        return $response->status() === 200;
+        return $response ? (int) $response->header('X-Pages') : 1;
     }
 
     /**
@@ -183,6 +161,28 @@ abstract class ESIRoute
     protected function etag(): string|null
     {
         return Redis::get($this->redisKey());
+    }
+
+    /**
+     * Detects if the response matched what's in our cache.
+     *
+     * @param Response $response
+     * @return bool
+     */
+    protected function isCurrent(Response $response): bool
+    {
+        return $response->status() === 304;
+    }
+
+    /**
+     * Detects if the response is "OK" or not.
+     *
+     * @param Response $response
+     * @return bool
+     */
+    protected function isValid(Response $response): bool
+    {
+        return $response->status() === 200;
     }
 
     /**

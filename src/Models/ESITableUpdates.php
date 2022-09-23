@@ -6,8 +6,33 @@ use Illuminate\Database\Eloquent\Model;
 
 class ESITableUpdates extends Model
 {
-    protected $table = 'esi_table_updates';
-    public $timestamps = false;
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'data' => 'json'
+    ];
+
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array<string>|bool
+     */
     protected $guarded = [];
-    protected $casts = ['data' => 'json'];
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'esi_table_updates';
+
+    /**
+     * Indicates if the model should be timestamped.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
 }

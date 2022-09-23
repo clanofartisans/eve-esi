@@ -3,17 +3,18 @@
 namespace Clanofartisans\EveEsi\Models;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class MarketOrder extends ESIModel
 {
     /**
-     * The table associated with the model.
+     * The attributes that should be cast.
      *
-     * @var string
+     * @var array
      */
-    protected $table = 'esi_market_orders';
+    protected $casts = [
+        'issued' => 'datetime'
+    ];
 
     /**
      * The primary key for the model.
@@ -23,13 +24,11 @@ class MarketOrder extends ESIModel
     protected $primaryKey = 'order_id';
 
     /**
-     * The attributes that should be cast.
+     * The table associated with the model.
      *
-     * @var array
+     * @var string
      */
-    protected $casts = [
-        'issued' => 'datetime'
-    ];
+    protected $table = 'esi_market_orders';
 
     /**
      * New
@@ -68,9 +67,9 @@ class MarketOrder extends ESIModel
      * New
      *
      * @param string $section
-     * @return Builder $this
+     * @return ESIModel $this
      */
-    public function whereSection(string $section): Builder
+    public function whereSection(string $section): ESIModel
     {
         return $this->where('region_id', $section);
     }

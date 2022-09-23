@@ -2,32 +2,26 @@
 
 namespace Clanofartisans\EveEsi\Models;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
-/**
- * @method static int insertOrIgnore(array $values)
- * @method \Illuminate\Database\Eloquent\Model|static updateOrCreate(array $attributes, array $values = [])
- * @method static int upsert(array $values, $uniqueBy, $update = null)
- * @method static \Illuminate\Database\Eloquent\Builder where($column, $operator = null, $value = null, $boolean = 'and')
- */
 abstract class ESIModel extends Model
 {
+
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array<string>|bool
+     */
+    protected $guarded = [];
+
     /**
      * Indicates if the model should be timestamped.
      *
      * @var bool
      */
     public $timestamps = false;
-
-    /**
-     * The attributes that aren't mass assignable.
-     *
-     * @var array
-     */
-    protected $guarded = [];
 
     /**
      * Cleans up empty or non-existent array keys.
@@ -58,7 +52,7 @@ abstract class ESIModel extends Model
      * New
      *
      * @param string $section
-     * @return Builder $this
+     * @return ESIModel $this
      */
-    abstract public function whereSection(string $section): Builder;
+    abstract public function whereSection(string $section): ESIModel;
 }
