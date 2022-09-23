@@ -2,12 +2,10 @@
 
 namespace Clanofartisans\EveEsi\Jobs\Handlers;
 
-use Clanofartisans\EveEsi\Auth\RefreshTokenException;
 use Clanofartisans\EveEsi\Facades\EveESI as ESI;
 use Clanofartisans\EveEsi\Jobs\Handlers\Concerns\HasIndex;
 use Clanofartisans\EveEsi\Models\Station;
 use Clanofartisans\EveEsi\Routes\ESIRoute;
-use Clanofartisans\EveEsi\Routes\InvalidESIResponseException;
 use Illuminate\Support\Collection;
 
 class Stations extends ESIHandler
@@ -36,6 +34,16 @@ class Stations extends ESIHandler
     public string $updateTable = 'stations';
 
     /**
+     * New - Specific override for this handler
+     *
+     * @return Collection
+     */
+    protected function fetchIndex(): Collection
+    {
+        return Station::all('station_id')->pluck('station_id');
+    }
+
+    /**
      * New - Per Handler, note that this isn't actually a valid route
      *
      * @return ESIRoute
@@ -54,15 +62,5 @@ class Stations extends ESIHandler
     protected function resourceRoute(int $id): ESIRoute
     {
         return ESI::universe()->stations()->station($id);
-    }
-
-    /**
-     * New - Specific override for this handler
-     *
-     * @return Collection
-     */
-    protected function fetchIndex(): Collection
-    {
-        return Station::all('station_id')->pluck('station_id');
     }
 }

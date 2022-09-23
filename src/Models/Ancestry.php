@@ -7,18 +7,18 @@ use Illuminate\Support\Collection;
 class Ancestry extends ESIModel
 {
     /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'esi_ancestries';
-
-    /**
      * The primary key for the model.
      *
      * @var string
      */
     protected $primaryKey = 'ancestry_id';
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'esi_ancestries';
 
     /**
      * New

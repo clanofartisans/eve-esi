@@ -7,18 +7,18 @@ use Illuminate\Support\Collection;
 class System extends ESIModel
 {
     /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'esi_systems';
-
-    /**
      * The primary key for the model.
      *
      * @var string
      */
     protected $primaryKey = 'system_id';
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'esi_systems';
 
     /**
      * Creates a record, or updates an existing record, from JSON data.

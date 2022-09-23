@@ -7,18 +7,18 @@ use Illuminate\Support\Collection;
 class Station extends ESIModel
 {
     /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'esi_stations';
-
-    /**
      * The primary key for the model.
      *
      * @var string
      */
     protected $primaryKey = 'station_id';
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'esi_stations';
 
     /**
      * Creates a record, or updates an existing record, from JSON data.

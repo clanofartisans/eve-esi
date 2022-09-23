@@ -12,24 +12,6 @@ use Illuminate\Support\Collection;
 trait HasIndex
 {
     /**
-     * New
-     *
-     * @return array
-     * @throws InvalidESIResponseException
-     * @throws RefreshTokenException
-     */
-    protected function buildFetchBatch(): array
-    {
-        $index = $this->fetchIndex();
-        $batch = [];
-        foreach($index as $id) {
-            $batch[] = new ESIFetchData($this::class, $this->section, $id);
-        }
-
-        return $batch;
-    }
-
-    /**
      * New - Maybe note the $page/$id thing
      *
      * @param string $section
@@ -53,6 +35,24 @@ trait HasIndex
         ];
 
         ESITableUpdates::insert($update);
+    }
+
+    /**
+     * New
+     *
+     * @return array
+     * @throws InvalidESIResponseException
+     * @throws RefreshTokenException
+     */
+    protected function buildFetchBatch(): array
+    {
+        $index = $this->fetchIndex();
+        $batch = [];
+        foreach($index as $id) {
+            $batch[] = new ESIFetchData($this::class, $this->section, $id);
+        }
+
+        return $batch;
     }
 
     /**

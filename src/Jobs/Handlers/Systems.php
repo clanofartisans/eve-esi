@@ -37,27 +37,6 @@ class Systems extends ESIHandler
     public string $updateTable = 'systems';
 
     /**
-     * New - Per Handler
-     *
-     * @return ESIRoute
-     */
-    protected function indexRoute(): ESIRoute
-    {
-        return ESI::universe()->systems();
-    }
-
-    /**
-     * New - Per Handler
-     *
-     * @param int $id
-     * @return ESIRoute
-     */
-    protected function resourceRoute(int $id): ESIRoute
-    {
-        return ESI::universe()->systems()->system($id);
-    }
-
-    /**
      * New
      *
      * @param string $section
@@ -87,6 +66,27 @@ class Systems extends ESIHandler
         $model = new $this->dataModel;
 
         $model->createFromJson($section, $updates);
+    }
+
+    /**
+     * New - Per Handler
+     *
+     * @return ESIRoute
+     */
+    protected function indexRoute(): ESIRoute
+    {
+        return ESI::universe()->systems();
+    }
+
+    /**
+     * New - Per Handler
+     *
+     * @param int $id
+     * @return ESIRoute
+     */
+    protected function resourceRoute(int $id): ESIRoute
+    {
+        return ESI::universe()->systems()->system($id);
     }
 
     /**

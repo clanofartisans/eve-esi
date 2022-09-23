@@ -13,22 +13,6 @@ trait NoIndex
     /**
      * New
      *
-     * @return array
-     */
-    protected function buildFetchBatch(): array
-    {
-        $pages = $this->pages();
-        $batch = [];
-        for($i = 1; $i <= $pages; $i++) {
-            $batch[] = new ESIFetchData($this::class, $this->section, $i);
-        }
-
-        return $batch;
-    }
-
-    /**
-     * New
-     *
      * @param string $section
      * @param int $page
      * @return void
@@ -56,6 +40,22 @@ trait NoIndex
             }
             ESITableUpdates::insert($updates);
         }
+    }
+
+    /**
+     * New
+     *
+     * @return array
+     */
+    protected function buildFetchBatch(): array
+    {
+        $pages = $this->pages();
+        $batch = [];
+        for($i = 1; $i <= $pages; $i++) {
+            $batch[] = new ESIFetchData($this::class, $this->section, $i);
+        }
+
+        return $batch;
     }
 
     /**

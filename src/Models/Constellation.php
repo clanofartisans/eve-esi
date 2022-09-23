@@ -7,18 +7,18 @@ use Illuminate\Support\Collection;
 class Constellation extends ESIModel
 {
     /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'esi_constellations';
-
-    /**
      * The primary key for the model.
      *
      * @var string
      */
     protected $primaryKey = 'constellation_id';
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'esi_constellations';
 
     /**
      * Creates a record, or updates an existing record, from JSON data.

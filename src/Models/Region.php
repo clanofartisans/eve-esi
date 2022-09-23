@@ -7,18 +7,18 @@ use Illuminate\Support\Collection;
 class Region extends ESIModel
 {
     /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'esi_regions';
-
-    /**
      * The primary key for the model.
      *
      * @var string
      */
     protected $primaryKey = 'region_id';
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'esi_regions';
 
     /**
      * Creates a record, or updates an existing record, from JSON data.

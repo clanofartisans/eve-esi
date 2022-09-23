@@ -7,18 +7,18 @@ use Illuminate\Support\Collection;
 class Group extends ESIModel
 {
     /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'esi_groups';
-
-    /**
      * The primary key for the model.
      *
      * @var string
      */
     protected $primaryKey = 'group_id';
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'esi_groups';
 
     /**
      * Creates a record, or updates an existing record, from JSON data.

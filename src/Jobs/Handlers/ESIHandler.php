@@ -16,7 +16,6 @@ use Throwable;
 
 abstract class ESIHandler
 {
-
     /**
      * The Eloquent model associated with this handler.
      *
@@ -118,10 +117,10 @@ abstract class ESIHandler
     {
         $this->section = $section;
 
-//        if(!$this->lock()) {
-//            logger('Unable to queue update "'. $this->name() . '" because of a lock.');
-//            return;
-//        }
+        if(!$this->lock()) {
+            logger('Unable to queue update "'. $this->name() . '" because of a lock.');
+            return;
+        }
 
         $this->clearTableUpdates();
 

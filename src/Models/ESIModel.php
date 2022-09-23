@@ -8,7 +8,6 @@ use Illuminate\Support\Collection;
 
 abstract class ESIModel extends Model
 {
-
     /**
      * The attributes that aren't mass assignable.
      *

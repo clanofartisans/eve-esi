@@ -7,18 +7,18 @@ use Illuminate\Support\Collection;
 class Type extends ESIModel
 {
     /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'esi_types';
-
-    /**
      * The primary key for the model.
      *
      * @var string
      */
     protected $primaryKey = 'type_id';
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'esi_types';
 
     /**
      * Creates a record, or updates an existing record, from JSON data.

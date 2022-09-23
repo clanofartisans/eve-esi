@@ -7,7 +7,6 @@ use Clanofartisans\EveEsi\Auth\RefreshTokenException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redis;
 
@@ -106,26 +105,6 @@ abstract class ESIRoute
         Redis::set($this->redisKey(), head($response->getHeader('etag')));
 
         return $response;
-    }
-
-    /**
-     * Retrieves all pages for a given ESI resource.
-     *
-     * @return array
-     * @throws InvalidESIResponseException
-     * @throws RefreshTokenException
-     */
-    public function getAllPages(): array
-    {
-        $pages = [];
-
-        for($page = 1; $page <= $this->getNumPages(); $page++) {
-            if($response = $this->page($page)->get(true)) {
-                $pages[$page] = $response->json();
-            }
-        }
-
-        return Arr::flatten($pages);
     }
 
     /**

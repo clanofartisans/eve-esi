@@ -37,6 +37,25 @@ class Structures extends ESIHandler
     public string $updateTable = 'structures';
 
     /**
+     * New
+     *
+     * @return Collection
+     * @throws InvalidESIResponseException
+     * @throws RefreshTokenException
+     */
+    protected function fetchIndex(): Collection
+    {
+        $public = $this->indexRoute()->get()->json();
+
+        $markets = MarketOrder::select('location_id')
+            ->where('location_id', '>', 1000000000000)
+            ->distinct()
+            ->pluck('location_id');
+
+        return $markets->merge($public)->unique();
+    }
+
+    /**
      * New - Per Handler
      *
      * @return ESIRoute
@@ -55,24 +74,5 @@ class Structures extends ESIHandler
     protected function resourceRoute(int $id): ESIRoute
     {
         return ESI::universe()->structures()->structure($id)->auth();
-    }
-
-    /**
-     * New
-     *
-     * @return Collection
-     * @throws InvalidESIResponseException
-     * @throws RefreshTokenException
-     */
-    protected function fetchIndex(): Collection
-    {
-        $public = $this->indexRoute()->get()->json();
-
-        $markets = MarketOrder::select('location_id')
-            ->where('location_id', '>', 1000000000000)
-            ->distinct()
-            ->pluck('location_id');
-
-        return $markets->merge($public)->unique();
     }
 }
