@@ -137,7 +137,7 @@ abstract class ESIRoute
     {
         $response = Http::head($this->uri(), $this->parameters['query']);
 
-        return $response ? (int) $response->header('X-Pages') : 1;
+        return !empty($response->header('X-Pages')) ? (int) $response->header('X-Pages') : 1;
     }
 
     /**
