@@ -43,7 +43,17 @@ class System extends ESIModel
                 'security_status' => $update->data['security_status'],
                 'star_id' => $update->data['star_id'],
                 'hash' => $update->hash
-            ], ['system_id'], ['name', 'security_class', 'security_status', 'hash']);
+            ], ['system_id'], [
+                'constellation_id',
+                'name',
+                'position_x',
+                'position_y',
+                'position_z',
+                'security_class',
+                'security_status',
+                'star_id',
+                'hash'
+            ]);
         }
     }
 

@@ -40,7 +40,16 @@ class Structure extends ESIModel
                 'position_z' => $update->data['position']['z'],
                 'type_id' => $update->data['type_id'],
                 'hash' => $update->hash
-            ], ['structure_id'], ['name', 'owner_id', 'hash']);
+            ], ['structure_id'], [
+                'system_id',
+                'name',
+                'owner_id',
+                'position_x',
+                'position_y',
+                'position_z',
+                'type_id',
+                'hash'
+            ]);
         }
     }
 

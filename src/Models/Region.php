@@ -37,7 +37,11 @@ class Region extends ESIModel
                 'name' => $update->data['name'],
                 'description' => $update->data['description'],
                 'hash' => $update->hash
-            ], ['region_id'], ['name', 'description', 'hash']);
+            ], ['region_id'], [
+                'name',
+                'description',
+                'hash'
+            ]);
         }
     }
 

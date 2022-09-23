@@ -38,7 +38,14 @@ class Constellation extends ESIModel
                 'position_y' => $update->data['position']['y'],
                 'position_z' => $update->data['position']['z'],
                 'hash' => $update->hash
-            ], ['constellation_id'], ['hash']);
+            ], ['constellation_id'], [
+                'region_id',
+                'name',
+                'position_x',
+                'position_y',
+                'position_z',
+                'hash'
+            ]);
         }
     }
 

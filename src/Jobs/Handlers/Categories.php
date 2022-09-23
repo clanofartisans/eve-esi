@@ -2,22 +2,14 @@
 
 namespace Clanofartisans\EveEsi\Jobs\Handlers;
 
-use Clanofartisans\EveEsi\Auth\RefreshTokenException;
-use Clanofartisans\EveEsi\Facades\EveESI as ESI;;
-use Clanofartisans\EveEsi\Jobs\Handlers\Contracts\HasResourceListRoute;
-use Clanofartisans\EveEsi\Jobs\Handlers\Contracts\HasSingleResourceRoute;
+use Clanofartisans\EveEsi\Facades\EveESI as ESI;
+use Clanofartisans\EveEsi\Jobs\Handlers\Concerns\HasIndex;
 use Clanofartisans\EveEsi\Models\Category;
 use Clanofartisans\EveEsi\Routes\ESIRoute;
-use Clanofartisans\EveEsi\Routes\InvalidESIResponseException;
 
-class Categories extends ESIHandler implements HasResourceListRoute, HasSingleResourceRoute
+class Categories extends ESIHandler
 {
-    /**
-     * The internal name of the table associated with this handler.
-     *
-     * @var string
-     */
-    public string $updateTable = 'categories';
+    use HasIndex;
 
     /**
      * The Eloquent model associated with this handler.
@@ -27,24 +19,36 @@ class Categories extends ESIHandler implements HasResourceListRoute, HasSingleRe
     public string $dataModel = Category::class;
 
     /**
-     * Retrieves and returns a list of record IDs from the ESI API.
+     * The name of the ID field as retrieved from ESI.
      *
-     * @return array
-     * @throws InvalidESIResponseException
-     * @throws RefreshTokenException
+     * @var string
      */
-    public function fetchIDs(): array
+    public string $esiIDName = 'category_id';
+
+    /**
+     * The internal name of the table associated with this handler.
+     *
+     * @var string
+     */
+    public string $updateTable = 'categories';
+
+    /**
+     * New - Per Handler
+     *
+     * @return ESIRoute
+     */
+    protected function indexRoute(): ESIRoute
     {
-        return ESI::universe()->categories()->get()->json();
+        return ESI::universe()->categories();
     }
 
     /**
-     * Returns the route pointing to a single resource for this handler.
+     * New - Per Handler
      *
      * @param int $id
      * @return ESIRoute
      */
-    public function resourceRoute(int $id): ESIRoute
+    protected function resourceRoute(int $id): ESIRoute
     {
         return ESI::universe()->categories()->category($id);
     }

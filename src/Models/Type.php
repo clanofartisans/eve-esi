@@ -2,6 +2,8 @@
 
 namespace Clanofartisans\EveEsi\Models;
 
+use Illuminate\Support\Collection;
+
 class Type extends ESIModel
 {
     /**
@@ -21,42 +23,68 @@ class Type extends ESIModel
     /**
      * Creates a record, or updates an existing record, from JSON data.
      *
-     * @param int $id
-     * @param array $data
-     * @param string $hash
-     * @return ESIModel
+     * @param string $section
+     * @param Collection $updates
+     * @return void
      */
-    public function createFromJson(int $id, array $data, string $hash): ESIModel
+    public function createFromJson(string $section, Collection $updates): void
     {
-        $data = $this->clean($data, [
-            'capacity',
-            'graphic_id',
-            'icon_id',
-            'market_group_id',
-            'mass',
-            'packaged_volume',
-            'portion_size',
-            'radius',
-            'volume'
-        ]);
+        foreach($updates as $update) {
+            $update->data = $this->clean($update->data, [
+                'capacity',
+                'graphic_id',
+                'icon_id',
+                'market_group_id',
+                'mass',
+                'packaged_volume',
+                'portion_size',
+                'radius',
+                'volume'
+            ]);
 
-        return $this->updateOrCreate([
-            'type_id' => $id
-        ], [
-            'group_id' => $data['group_id'],
-            'name' => $data['name'],
-            'description' => $data['description'],
-            'capacity' => $data['capacity'],
-            'graphic_id' => $data['graphic_id'],
-            'icon_id' => $data['icon_id'],
-            'market_group_id' => $data['market_group_id'],
-            'mass' => $data['mass'],
-            'packaged_volume' => $data['packaged_volume'],
-            'portion_size' => $data['portion_size'],
-            'radius' => $data['radius'],
-            'volume' => $data['volume'],
-            'published' => $data['published'],
-            'hash' => $hash
-        ]);
+            $this->upsert([
+                'type_id' => $update->data_id,
+                'group_id' => $update->data['group_id'],
+                'name' => $update->data['name'],
+                'description' => $update->data['description'],
+                'capacity' => $update->data['capacity'],
+                'graphic_id' => $update->data['graphic_id'],
+                'icon_id' => $update->data['icon_id'],
+                'market_group_id' => $update->data['market_group_id'],
+                'mass' => $update->data['mass'],
+                'packaged_volume' => $update->data['packaged_volume'],
+                'portion_size' => $update->data['portion_size'],
+                'radius' => $update->data['radius'],
+                'volume' => $update->data['volume'],
+                'published' => $update->data['published'],
+                'hash' => $update->hash
+            ], ['type_id'], [
+                'group_id',
+                'name',
+                'description',
+                'capacity',
+                'graphic_id',
+                'icon_id',
+                'market_group_id',
+                'mass',
+                'packaged_volume',
+                'portion_size',
+                'radius',
+                'volume',
+                'published',
+                'hash'
+            ]);
+        }
+    }
+
+    /**
+     * New
+     *
+     * @param string $section
+     * @return $this
+     */
+    public function whereSection(string $section)
+    {
+        return $this;
     }
 }

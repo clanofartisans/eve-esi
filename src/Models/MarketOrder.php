@@ -3,7 +3,6 @@
 namespace Clanofartisans\EveEsi\Models;
 
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class MarketOrder extends ESIModel
@@ -60,7 +59,12 @@ class MarketOrder extends ESIModel
                 'volume_remain' => $update->data['volume_remain'],
                 'volume_total' => $update->data['volume_total'],
                 'hash' => $update->hash
-            ], ['order_id'], ['price', 'issued', 'volume_remain', 'hash']);
+            ], ['order_id'], [
+                'price',
+                'issued',
+                'volume_remain',
+                'hash'
+            ]);
         }
     }
 

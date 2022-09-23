@@ -2,6 +2,8 @@
 
 namespace Clanofartisans\EveEsi\Models;
 
+use Illuminate\Support\Collection;
+
 class Ancestry extends ESIModel
 {
     /**
@@ -19,26 +21,44 @@ class Ancestry extends ESIModel
     protected $primaryKey = 'ancestry_id';
 
     /**
-     * Creates a record, or updates an existing record, from JSON data.
+     * New
      *
-     * @param int $id
-     * @param array $data
-     * @param string $hash
-     * @return ESIModel
+     * @param string $section
+     * @param Collection $updates
+     * @return void
      */
-    public function createFromJson(int $id, array $data, string $hash): ESIModel
+    public function createFromJson(string $section, Collection $updates): void
     {
-        $data = $this->clean($data, ['short_description', 'icon_id']);
+        foreach($updates as $update) {
+            $update->data = $this->clean($update->data, ['short_description', 'icon_id']);
 
-        return $this->updateOrCreate([
-            'ancestry_id' => $id
-        ], [
-            'bloodline_id' => $data['bloodline_id'],
-            'name' => $data['name'],
-            'description' => $data['description'],
-            'short_description' => $data['short_description'],
-            'icon_id' => $data['icon_id'],
-            'hash' => $hash
-        ]);
+            $this->upsert([
+                'ancestry_id' => $update->data_id,
+                'bloodline_id' => $update->data['bloodline_id'],
+                'name' => $update->data['name'],
+                'description' => $update->data['description'],
+                'short_description' => $update->data['short_description'],
+                'icon_id' => $update->data['icon_id'],
+                'hash' => $update->hash
+            ], ['ancestry_id'], [
+                'bloodline_id',
+                'name',
+                'description',
+                'short_description',
+                'icon_id',
+                'hash'
+            ]);
+        }
+    }
+
+    /**
+     * New
+     *
+     * @param string $section
+     * @return $this
+     */
+    public function whereSection(string $section)
+    {
+        return $this;
     }
 }
