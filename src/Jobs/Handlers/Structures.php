@@ -4,22 +4,16 @@ namespace Clanofartisans\EveEsi\Jobs\Handlers;
 
 use Clanofartisans\EveEsi\Auth\RefreshTokenException;
 use Clanofartisans\EveEsi\Facades\EveESI as ESI;
-use Clanofartisans\EveEsi\Jobs\Handlers\Contracts\HasResourceListRoute;
-use Clanofartisans\EveEsi\Jobs\Handlers\Contracts\HasSingleResourceRoute;
+use Clanofartisans\EveEsi\Jobs\Handlers\Concerns\HasIndex;
 use Clanofartisans\EveEsi\Models\MarketOrder;
 use Clanofartisans\EveEsi\Models\Structure;
 use Clanofartisans\EveEsi\Routes\ESIRoute;
 use Clanofartisans\EveEsi\Routes\InvalidESIResponseException;
 use Illuminate\Support\Collection;
 
-class Structures extends ESIHandler implements HasResourceListRoute, HasSingleResourceRoute
+class Structures extends ESIHandler
 {
-    /**
-     * The internal name of the table associated with this handler.
-     *
-     * @var string
-     */
-    public string $updateTable = 'structures';
+    use HasIndex;
 
     /**
      * The Eloquent model associated with this handler.
@@ -29,32 +23,56 @@ class Structures extends ESIHandler implements HasResourceListRoute, HasSingleRe
     public string $dataModel = Structure::class;
 
     /**
-     * Retrieves and returns a list of record IDs from the ESI API.
+     * The name of the ID field as retrieved from ESI.
      *
-     * @return array
-     * @throws InvalidESIResponseException
-     * @throws RefreshTokenException
+     * @var string
      */
-    public function fetchIDs(): array
+    public string $esiIDName = 'structure_id';
+
+    /**
+     * The internal name of the table associated with this handler.
+     *
+     * @var string
+     */
+    public string $updateTable = 'structures';
+
+    /**
+     * New - Per Handler
+     *
+     * @return ESIRoute
+     */
+    protected function indexRoute(): ESIRoute
     {
-        $public = ESI::universe()->structures()->get()->json();
-
-        $markets = MarketOrder::select('location_id')
-            ->where('location_type', 'structure')
-            ->distinct()
-            ->pluck('location_id');
-
-        return $markets->merge($public)->unique()->toArray();
+        return ESI::universe()->structures();
     }
 
     /**
-     * Returns the route pointing to a single resource for this handler.
+     * New - Per Handler
      *
      * @param int $id
      * @return ESIRoute
      */
-    public function resourceRoute(int $id): ESIRoute
+    protected function resourceRoute(int $id): ESIRoute
     {
         return ESI::universe()->structures()->structure($id)->auth();
+    }
+
+    /**
+     * New
+     *
+     * @return Collection
+     * @throws InvalidESIResponseException
+     * @throws RefreshTokenException
+     */
+    protected function fetchIndex(): Collection
+    {
+        $public = $this->indexRoute()->get()->json();
+
+        $markets = MarketOrder::select('location_id')
+            ->where('location_id', '>', 1000000000000)
+            ->distinct()
+            ->pluck('location_id');
+
+        return $markets->merge($public)->unique();
     }
 }

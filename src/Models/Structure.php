@@ -2,6 +2,8 @@
 
 namespace Clanofartisans\EveEsi\Models;
 
+use Illuminate\Support\Collection;
+
 class Structure extends ESIModel
 {
     /**
@@ -21,24 +23,35 @@ class Structure extends ESIModel
     /**
      * Creates a record, or updates an existing record, from JSON data.
      *
-     * @param int $id
-     * @param array $data
-     * @param string $hash
-     * @return ESIModel
+     * @param string $section
+     * @param Collection $updates
+     * @return void
      */
-    public function createFromJson(int $id, array $data, string $hash): ESIModel
+    public function createFromJson(string $section, Collection $updates): void
     {
-        return $this->updateOrCreate([
-            'structure_id' => $id
-        ], [
-            'system_id' => $data['solar_system_id'],
-            'name' => $data['name'],
-            'owner_id' => $data['owner_id'],
-            'position_x' => $data['position']['x'],
-            'position_y' => $data['position']['y'],
-            'position_z' => $data['position']['z'],
-            'type_id' => $data['type_id'],
-            'hash' => $hash
-        ]);
+        foreach ($updates as $update) {
+            $this->upsert([
+                'structure_id' => $update->data_id,
+                'system_id' => $update->data['solar_system_id'],
+                'name' => $update->data['name'],
+                'owner_id' => $update->data['owner_id'],
+                'position_x' => $update->data['position']['x'],
+                'position_y' => $update->data['position']['y'],
+                'position_z' => $update->data['position']['z'],
+                'type_id' => $update->data['type_id'],
+                'hash' => $update->hash
+            ], ['structure_id'], ['name', 'owner_id', 'hash']);
+        }
+    }
+
+    /**
+     * New
+     *
+     * @param string $section
+     * @return $this
+     */
+    public function whereSection(string $section)
+    {
+        return $this;
     }
 }

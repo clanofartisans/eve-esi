@@ -2,6 +2,8 @@
 
 namespace Clanofartisans\EveEsi\Models;
 
+use Illuminate\Support\Collection;
+
 class Region extends ESIModel
 {
     /**
@@ -21,21 +23,32 @@ class Region extends ESIModel
     /**
      * Creates a record, or updates an existing record, from JSON data.
      *
-     * @param int $id
-     * @param array $data
-     * @param string $hash
-     * @return ESIModel
+     * @param string $section
+     * @param Collection $updates
+     * @return void
      */
-    public function createFromJson(int $id, array $data, string $hash): ESIModel
+    public function createFromJson(string $section, Collection $updates): void
     {
-        $data = $this->clean($data, ['description']);
+        foreach($updates as $update) {
+            $update->data = $this->clean($update->data, ['description']);
 
-        return $this->updateOrCreate([
-            'region_id' => $id
-        ], [
-            'description' => $data['description'],
-            'name' => $data['name'],
-            'hash' => $hash
-        ]);
+            $this->upsert([
+                'region_id' => $update->data_id,
+                'name' => $update->data['name'],
+                'description' => $update->data['description'],
+                'hash' => $update->hash
+            ], ['region_id'], ['name', 'description', 'hash']);
+        }
+    }
+
+    /**
+     * New
+     *
+     * @param string $section
+     * @return $this
+     */
+    public function whereSection(string $section)
+    {
+        return $this;
     }
 }

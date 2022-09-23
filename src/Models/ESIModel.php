@@ -52,7 +52,7 @@ abstract class ESIModel extends Model
      * New
      *
      * @param string $section
-     * @return ESIModel $this
+     * @return $this
      */
-    abstract public function whereSection(string $section): ESIModel;
+    abstract public function whereSection(string $section);
 }

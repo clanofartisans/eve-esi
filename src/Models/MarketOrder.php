@@ -3,6 +3,7 @@
 namespace Clanofartisans\EveEsi\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class MarketOrder extends ESIModel
@@ -67,9 +68,9 @@ class MarketOrder extends ESIModel
      * New
      *
      * @param string $section
-     * @return ESIModel $this
+     * @return $this
      */
-    public function whereSection(string $section): ESIModel
+    public function whereSection(string $section)
     {
         return $this->where('region_id', $section);
     }

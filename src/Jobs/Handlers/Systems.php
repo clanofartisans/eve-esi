@@ -2,33 +2,18 @@
 
 namespace Clanofartisans\EveEsi\Jobs\Handlers;
 
-use Clanofartisans\EveEsi\Auth\RefreshTokenException;
 use Clanofartisans\EveEsi\Facades\EveESI as ESI;
-use Clanofartisans\EveEsi\Jobs\Handlers\Contracts\HasResourceListRoute;
-use Clanofartisans\EveEsi\Jobs\Handlers\Contracts\HasSingleResourceRoute;
+use Clanofartisans\EveEsi\Jobs\Handlers\Concerns\HasIndex;
 use Clanofartisans\EveEsi\Models\Constellation;
 use Clanofartisans\EveEsi\Models\ESITableUpdates;
 use Clanofartisans\EveEsi\Models\Station;
 use Clanofartisans\EveEsi\Models\System;
 use Clanofartisans\EveEsi\Routes\ESIRoute;
-use Clanofartisans\EveEsi\Routes\InvalidESIResponseException;
 use Illuminate\Support\Arr;
 
-class Systems extends ESIHandler implements HasResourceListRoute, HasSingleResourceRoute
+class Systems extends ESIHandler
 {
-    /**
-     * The internal name of the table associated with this handler.
-     *
-     * @var string
-     */
-    public string $updateTable = 'systems';
-
-    /**
-     * The internal name of the table section associated with this handler.
-     *
-     * @var string
-     */
-    public string $updateSection = '*';
+    use HasIndex;
 
     /**
      * The Eloquent model associated with this handler.
@@ -38,39 +23,70 @@ class Systems extends ESIHandler implements HasResourceListRoute, HasSingleResou
     public string $dataModel = System::class;
 
     /**
-     * Retrieves and returns a list of record IDs from the ESI API.
+     * The name of the ID field as retrieved from ESI.
      *
-     * @return array
-     * @throws InvalidESIResponseException
-     * @throws RefreshTokenException
+     * @var string
      */
-    public function fetchIDs(): array
+    public string $esiIDName = 'system_id';
+
+    /**
+     * The internal name of the table associated with this handler.
+     *
+     * @var string
+     */
+    public string $updateTable = 'systems';
+
+    /**
+     * New - Per Handler
+     *
+     * @return ESIRoute
+     */
+    protected function indexRoute(): ESIRoute
     {
-        return ESI::universe()->systems()->get()->json();
+        return ESI::universe()->systems();
     }
 
     /**
-     * Handles cleanup and any special post-processing after the data has been upserted.
-     *
-     * @param string $section
-     * @return void
-     */
-    public function postProcessing(string $section = '*'): void
-    {
-        $this->specialPopulateStationIDs();
-        $this->specialSetRegionIDs();
-        $this->cleanupTableUpdates($section);
-    }
-
-    /**
-     * Returns the route pointing to a single resource for this handler.
+     * New - Per Handler
      *
      * @param int $id
      * @return ESIRoute
      */
-    public function resourceRoute(int $id): ESIRoute
+    protected function resourceRoute(int $id): ESIRoute
     {
         return ESI::universe()->systems()->system($id);
+    }
+
+    /**
+     * New
+     *
+     * @param string $section
+     * @return void
+     */
+    public function specialData(string $section): void
+    {
+        $this->specialPopulateStationIDs();
+        $this->specialSetRegionIDs();
+        $this->clearTableUpdates();
+
+        parent::specialData($section);
+    }
+
+    /**
+     * New - Note override to delay clearing table updates
+     *
+     * @param string $section
+     * @param array $ids
+     * @return void
+     */
+    public function upsertData(string $section, array $ids): void
+    {
+        $updates = ESITableUpdates::whereIntegerInRaw('id', $ids)
+            ->get(['data_id', 'data', 'hash']);
+
+        $model = new $this->dataModel;
+
+        $model->createFromJson($section, $updates);
     }
 
     /**
@@ -81,7 +97,7 @@ class Systems extends ESIHandler implements HasResourceListRoute, HasSingleResou
     protected function specialPopulateStationIDs(): void
     {
         $list = ESITableUpdates::where('table', $this->updateTable)
-            ->where('section', $this->updateSection)
+            ->where('section', $this->section)
             ->pluck('id');
 
         foreach($list as $id) {
@@ -111,4 +127,3 @@ class Systems extends ESIHandler implements HasResourceListRoute, HasSingleResou
         }
     }
 }
-

@@ -2,6 +2,8 @@
 
 namespace Clanofartisans\EveEsi\Models;
 
+use Illuminate\Support\Collection;
+
 class Constellation extends ESIModel
 {
     /**
@@ -21,22 +23,33 @@ class Constellation extends ESIModel
     /**
      * Creates a record, or updates an existing record, from JSON data.
      *
-     * @param int $id
-     * @param array $data
-     * @param string $hash
-     * @return ESIModel
+     * @param string $section
+     * @param Collection $updates
+     * @return void
      */
-    public function createFromJson(int $id, array $data, string $hash): ESIModel
+    public function createFromJson(string $section, Collection $updates): void
     {
-        return $this->updateOrCreate([
-            'constellation_id' => $id
-        ], [
-            'region_id' => $data['region_id'],
-            'name' => $data['name'],
-            'position_x' => $data['position']['x'],
-            'position_y' => $data['position']['y'],
-            'position_z' => $data['position']['z'],
-            'hash' => $hash
-        ]);
+        foreach($updates as $update) {
+            $this->upsert([
+                'constellation_id' => $update->data_id,
+                'region_id' => $update->data['region_id'],
+                'name' => $update->data['name'],
+                'position_x' => $update->data['position']['x'],
+                'position_y' => $update->data['position']['y'],
+                'position_z' => $update->data['position']['z'],
+                'hash' => $update->hash
+            ], ['constellation_id'], ['hash']);
+        }
+    }
+
+    /**
+     * New
+     *
+     * @param string $section
+     * @return $this
+     */
+    public function whereSection(string $section)
+    {
+        return $this;
     }
 }

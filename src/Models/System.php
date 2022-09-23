@@ -2,6 +2,8 @@
 
 namespace Clanofartisans\EveEsi\Models;
 
+use Illuminate\Support\Collection;
+
 class System extends ESIModel
 {
     /**
@@ -21,27 +23,38 @@ class System extends ESIModel
     /**
      * Creates a record, or updates an existing record, from JSON data.
      *
-     * @param int $id
-     * @param array $data
-     * @param string $hash
-     * @return ESIModel
+     * @param string $section
+     * @param Collection $updates
+     * @return void
      */
-    public function createFromJson(int $id, array $data, string $hash): ESIModel
+    public function createFromJson(string $section, Collection $updates): void
     {
-        $data = $this->clean($data, ['security_class', 'star_id']);
+        foreach($updates as $update) {
+            $update->data = $this->clean($update->data, ['security_class', 'star_id']);
 
-        return $this->updateOrCreate([
-            'system_id' => $id
-        ], [
-            'constellation_id' => $data['constellation_id'],
-            'name' => $data['name'],
-            'position_x' => $data['position']['x'],
-            'position_y' => $data['position']['y'],
-            'position_z' => $data['position']['z'],
-            'security_class' => $data['security_class'],
-            'security_status' => $data['security_status'],
-            'star_id' => $data['star_id'],
-            'hash' => $hash
-        ]);
+            $this->upsert([
+                'system_id' => $update->data_id,
+                'constellation_id' => $update->data['constellation_id'],
+                'name' => $update->data['name'],
+                'position_x' => $update->data['position']['x'],
+                'position_y' => $update->data['position']['y'],
+                'position_z' => $update->data['position']['z'],
+                'security_class' => $update->data['security_class'],
+                'security_status' => $update->data['security_status'],
+                'star_id' => $update->data['star_id'],
+                'hash' => $update->hash
+            ], ['system_id'], ['name', 'security_class', 'security_status', 'hash']);
+        }
+    }
+
+    /**
+     * New
+     *
+     * @param string $section
+     * @return $this
+     */
+    public function whereSection(string $section)
+    {
+        return $this;
     }
 }
