@@ -5,14 +5,6 @@ namespace Clanofartisans\EveEsi\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Http;
 
-/**
- * @property int $expiresIn
- * @property string $refreshToken
- * @property string $token
- *
- * @method static \Illuminate\Database\Eloquent\Model|static updateOrCreate(array $attributes, array $values)
- * @method static \Illuminate\Database\Eloquent\Builder where($column, $operator = null, $value = null, $boolean = 'and')
- */
 class ESIAuth extends Model
 {
     /**

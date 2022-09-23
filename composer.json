@@ -12,7 +12,8 @@
     "homepage": "https://github.com/clanofartisans/eve-esi",
     "keywords": ["Laravel"],
     "require": {
-        "illuminate/support": "~9"
+        "illuminate/support": "~9",
+        "socialiteproviders/eveonline": "^4.2"
     },
     "require-dev": {
         "phpunit/phpunit": "~9.0",

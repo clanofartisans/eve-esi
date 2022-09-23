@@ -3,7 +3,6 @@
 namespace Clanofartisans\EveEsi\Jobs;
 
 use Illuminate\Bus\Batchable;
-use Throwable;
 
 class ESIUpsertData extends ESIJob
 {
@@ -46,7 +45,6 @@ class ESIUpsertData extends ESIJob
      * New
      *
      * @return void
-     * @throws Throwable
      */
     public function handle(): void
     {

@@ -2,8 +2,6 @@
 
 namespace Clanofartisans\EveEsi\Jobs;
 
-use Throwable;
-
 class ESIUpdate extends ESIJob
 {
     /**
@@ -35,7 +33,6 @@ class ESIUpdate extends ESIJob
      * Fetches and processes updates to ESI resource data.
      *
      * @return void
-     * @throws Throwable
      */
     public function handle(): void
     {
