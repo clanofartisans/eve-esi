@@ -26,7 +26,8 @@ return new class extends Migration
             $table->unsignedBigInteger('star_id')->nullable();
             $table->char('hash', 32);
 
-            $table->unique(['region_id', 'system_id']);
+            $table->index('region_id');
+            $table->index('hash');
         });
     }
 

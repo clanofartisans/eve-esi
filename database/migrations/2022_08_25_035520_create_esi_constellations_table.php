@@ -22,7 +22,7 @@ return new class extends Migration
             $table->decimal('position_z', 25, 0);
             $table->char('hash', 32);
 
-            $table->unique(['region_id', 'constellation_id']);
+            $table->index('hash');
         });
     }
 

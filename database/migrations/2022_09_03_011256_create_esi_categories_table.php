@@ -19,7 +19,7 @@ return new class extends Migration
             $table->boolean('published');
             $table->char('hash', 32);
 
-            $table->index('published');
+            $table->index('hash');
         });
     }
 

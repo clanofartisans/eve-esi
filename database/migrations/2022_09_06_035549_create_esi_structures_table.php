@@ -25,6 +25,7 @@ return new class extends Migration
             $table->char('hash', 32)->nullable();
 
             $table->index('system_id');
+            $table->index('hash');
         });
     }
 

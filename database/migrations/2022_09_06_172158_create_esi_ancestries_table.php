@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('short_description')->nullable();
             $table->unsignedBigInteger('icon_id')->nullable();
             $table->char('hash', 32)->nullable();
+
+            $table->index('hash');
         });
     }
 

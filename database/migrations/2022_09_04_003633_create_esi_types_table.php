@@ -33,7 +33,7 @@ return new class extends Migration
             $table->index('group_id');
             $table->index('market_group_id');
             $table->index('name');
-            $table->index('published');
+            $table->index('hash');
         });
     }
 

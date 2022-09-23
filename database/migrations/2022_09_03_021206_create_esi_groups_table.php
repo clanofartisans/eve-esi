@@ -21,7 +21,7 @@ return new class extends Migration
             $table->char('hash', 32);
 
             $table->index('category_id');
-            $table->index('published');
+            $table->index('hash');
         });
     }
 

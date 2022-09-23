@@ -20,6 +20,7 @@ return new class extends Migration
             $table->char('hash', 32);
 
             $table->primary('region_id');
+            $table->index('hash');
         });
     }
 
