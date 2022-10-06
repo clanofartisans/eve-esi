@@ -7,6 +7,7 @@ use Clanofartisans\EveEsi\Jobs\Handlers\Ancestries;
 use Clanofartisans\EveEsi\Jobs\Handlers\Categories;
 use Clanofartisans\EveEsi\Jobs\Handlers\Constellations;
 use Clanofartisans\EveEsi\Jobs\Handlers\Groups;
+use Clanofartisans\EveEsi\Jobs\Handlers\MarketGroups;
 use Clanofartisans\EveEsi\Jobs\Handlers\Regions;
 use Clanofartisans\EveEsi\Jobs\Handlers\Stations;
 use Clanofartisans\EveEsi\Jobs\Handlers\Structures;
@@ -46,6 +47,8 @@ class ESIUpdate extends Command
                 ESIUpdateJob::dispatch(Constellations::class),
             'groups' =>
                 ESIUpdateJob::dispatch(Groups::class),
+            'market_groups' =>
+                ESIUpdateJob::dispatch(MarketGroups::class),
             'regions' =>
                 ESIUpdateJob::dispatch(Regions::class),
             'stations' =>
