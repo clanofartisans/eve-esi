@@ -3,6 +3,7 @@
 namespace Clanofartisans\EveEsi\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Collection;
 
 class MarketOrder extends ESIModel
@@ -77,5 +78,15 @@ class MarketOrder extends ESIModel
     public function whereSection(string $section)
     {
         return $this->where('region_id', $section);
+    }
+
+    /**
+     * New
+     *
+     * @return BelongsTo
+     */
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class, 'location_id', 'location_id');
     }
 }
