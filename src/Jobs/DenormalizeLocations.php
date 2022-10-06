@@ -3,8 +3,10 @@
 namespace Clanofartisans\EveEsi\Jobs;
 
 use Clanofartisans\EveEsi\Models\Location;
+use Clanofartisans\EveEsi\Models\MarketOrder;
 use Clanofartisans\EveEsi\Models\Station;
 use Clanofartisans\EveEsi\Models\Structure;
+use Clanofartisans\EveEsi\Models\System;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -23,8 +25,10 @@ class DenormalizeLocations implements ShouldQueue
     public function handle(): void
     {
         $locations = [];
+
+        // Get Stations
         foreach(Station::lazy() as $station) {
-            $locations[] = [
+            $locations[$station->station_id] = [
                 'system_id' => $station->system_id,
                 'location_type' => 'station',
                 'location_id' => $station->station_id,
@@ -33,8 +37,9 @@ class DenormalizeLocations implements ShouldQueue
             ];
         }
 
+        // Get Structures
         foreach(Structure::lazy() as $structure) {
-            $locations[] = [
+            $locations[$structure->structure_id] = [
                 'system_id' => $structure->system_id,
                 'location_type' => 'structure',
                 'location_id' => $structure->structure_id,
@@ -43,6 +48,28 @@ class DenormalizeLocations implements ShouldQueue
             ];
         }
 
+        // Get unknown Structures from Market Orders
+
+        $markets = MarketOrder::select('system_id', 'location_id')
+            ->where('location_id', '>', 1000000000000)
+            ->distinct()
+            ->get();
+
+        foreach($markets as $market) {
+            if(!isset($locations[$market->location_id])) {
+                $unknown = [
+                    'system_id' => $market->system_id,
+                    'location_type' => 'structure',
+                    'location_id' => $market->location_id
+                ];
+                $system = System::find($market->system_id);
+                $unknown['name'] = $system->name . ' - Unknown Structure';
+                $unknown['security_status'] = $this->calculateSecurity($system->security_status);
+                $locations[$market->location_id] = $unknown;
+            }
+        }
+
+        // Upsert all Locations
         foreach($locations as $location) {
             Location::upsert([
                 'system_id' => $location['system_id'],
