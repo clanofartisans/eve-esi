@@ -8,6 +8,7 @@ use Clanofartisans\EveEsi\Jobs\ESIPruneData;
 use Clanofartisans\EveEsi\Jobs\Handlers\Concerns\HasIndex;
 use Clanofartisans\EveEsi\Models\MarketOrder;
 use Clanofartisans\EveEsi\Models\Structure;
+use Clanofartisans\EveEsi\Models\System;
 use Clanofartisans\EveEsi\Routes\ESIRoute;
 use Clanofartisans\EveEsi\Routes\InvalidESIResponseException;
 use Illuminate\Support\Collection;
@@ -59,6 +60,19 @@ class Structures extends ESIHandler
     /**
      * New
      *
+     * @param string $section
+     * @return void
+     */
+    public function specialData(string $section): void
+    {
+        $this->specialSetSecurityStatus();
+
+        parent::specialData($section);
+    }
+
+    /**
+     * New
+     *
      * @return Collection
      * @throws InvalidESIResponseException
      * @throws RefreshTokenException
@@ -94,5 +108,20 @@ class Structures extends ESIHandler
     protected function resourceRoute(int $id): ESIRoute
     {
         return ESI::universe()->structures()->structure($id)->auth();
+    }
+
+    /**
+     * New
+     *
+     * @return void
+     */
+    protected function specialSetSecurityStatus(): void
+    {
+        $systems = System::all();
+
+        foreach($systems as $system) {
+            Structure::where('system_id', $system->system_id)
+                ->update(['security_status' => $system->security_status]);
+        }
     }
 }

@@ -106,6 +106,7 @@ class Systems extends ESIHandler
             foreach ($stations as $station) {
                 Station::insertOrIgnore([
                     'system_id' => $system->data['system_id'],
+                    'security_status' => $system->data['security_status'],
                     'station_id' => $station
                 ]);
             }

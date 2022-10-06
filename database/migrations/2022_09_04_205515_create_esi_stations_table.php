@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('system_id');
             $table->unsignedBigInteger('station_id')->primary();
             $table->string('name')->nullable();
+            $table->decimal('security_status', 27, 25);
             $table->string('max_dockable_ship_volume')->nullable();
             $table->string('office_rental_cost')->nullable();
             $table->unsignedBigInteger('owner')->nullable();

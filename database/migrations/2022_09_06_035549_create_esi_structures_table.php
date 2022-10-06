@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('structure_id')->primary();
             $table->string('name')->nullable();
             $table->unsignedBigInteger('owner_id')->nullable();
+            $table->decimal('security_status', 27, 25)->nullable();
             $table->decimal('position_x', 25, 0)->nullable();
             $table->decimal('position_y', 25, 0)->nullable();
             $table->decimal('position_z', 25, 0)->nullable();

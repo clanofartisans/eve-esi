@@ -2,6 +2,7 @@
 
 namespace Clanofartisans\EveEsi\Commands;
 
+use Clanofartisans\EveEsi\Jobs\DenormalizeLocations;
 use Clanofartisans\EveEsi\Jobs\ESIUpdate as ESIUpdateJob;
 use Clanofartisans\EveEsi\Jobs\Handlers\Ancestries;
 use Clanofartisans\EveEsi\Jobs\Handlers\Categories;
@@ -47,6 +48,8 @@ class ESIUpdate extends Command
                 ESIUpdateJob::dispatch(Constellations::class),
             'groups' =>
                 ESIUpdateJob::dispatch(Groups::class),
+            'locations' =>
+                DenormalizeLocations::dispatch(),
             'market_groups' =>
                 ESIUpdateJob::dispatch(MarketGroups::class),
             'regions' =>
