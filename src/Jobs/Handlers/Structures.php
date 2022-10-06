@@ -4,12 +4,15 @@ namespace Clanofartisans\EveEsi\Jobs\Handlers;
 
 use Clanofartisans\EveEsi\Auth\RefreshTokenException;
 use Clanofartisans\EveEsi\Facades\EveESI as ESI;
+use Clanofartisans\EveEsi\Jobs\ESIPruneData;
 use Clanofartisans\EveEsi\Jobs\Handlers\Concerns\HasIndex;
 use Clanofartisans\EveEsi\Models\MarketOrder;
 use Clanofartisans\EveEsi\Models\Structure;
 use Clanofartisans\EveEsi\Routes\ESIRoute;
 use Clanofartisans\EveEsi\Routes\InvalidESIResponseException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Bus;
+use Throwable;
 
 class Structures extends ESIHandler
 {
@@ -35,6 +38,23 @@ class Structures extends ESIHandler
      * @var string
      */
     public string $updateTable = 'structures';
+
+    /**
+     * New
+     *
+     * @param string $section
+     * @return void
+     * @throws Throwable
+     */
+    public function batchFetchData(string $section): void
+    {
+        $this->section = $section;
+
+        $batch = $this->buildFetchBatch();
+        Bus::batch($batch)->finally(function () {
+            ESIPruneData::dispatch($this::class, $this->section);
+        })->allowFailures()->dispatch();
+    }
 
     /**
      * New
