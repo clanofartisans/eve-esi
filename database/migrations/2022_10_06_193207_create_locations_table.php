@@ -14,7 +14,10 @@ return new class extends Migration
     public function up()
     {
         Schema::create('locations', function (Blueprint $table) {
+            $table->unsignedBigInteger('region_id');
+            $table->string('region_name');
             $table->unsignedBigInteger('system_id');
+            $table->string('system_name');
             $table->enum('location_type', ['station', 'structure']);
             $table->unsignedBigInteger('location_id')->primary();
             $table->string('name');
