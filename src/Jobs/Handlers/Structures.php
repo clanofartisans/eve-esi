@@ -60,19 +60,6 @@ class Structures extends ESIHandler
     /**
      * New
      *
-     * @param string $section
-     * @return void
-     */
-    public function specialData(string $section): void
-    {
-        $this->specialSetSecurityStatus();
-
-        parent::specialData($section);
-    }
-
-    /**
-     * New
-     *
      * @return Collection
      * @throws InvalidESIResponseException
      * @throws RefreshTokenException
@@ -108,20 +95,5 @@ class Structures extends ESIHandler
     protected function resourceRoute(int $id): ESIRoute
     {
         return ESI::universe()->structures()->structure($id)->auth();
-    }
-
-    /**
-     * New
-     *
-     * @return void
-     */
-    protected function specialSetSecurityStatus(): void
-    {
-        $systems = System::all();
-
-        foreach($systems as $system) {
-            Structure::where('system_id', $system->system_id)
-                ->update(['security_status' => $system->security_status]);
-        }
     }
 }
