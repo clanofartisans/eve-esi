@@ -96,16 +96,15 @@ class Systems extends ESIHandler
      */
     protected function specialPopulateStationIDs(): void
     {
-        $list = ESITableUpdates::where('table', $this->updateTable)
+        $updates = ESITableUpdates::where('table', $this->updateTable)
             ->where('section', $this->section)
-            ->pluck('id');
+            ->lazy();
 
-        foreach($list as $id) {
-            $system = ESITableUpdates::find($id);
-            $stations = Arr::exists($system->data, 'stations') ? $system->data['stations'] : [];
+        foreach($updates as $update) {
+            $stations = Arr::exists($update->data, 'stations') ? $update->data['stations'] : [];
             foreach ($stations as $station) {
                 Station::insertOrIgnore([
-                    'system_id' => $system->data['system_id'],
+                    'system_id' => $update->data['system_id'],
                     'station_id' => $station
                 ]);
             }
