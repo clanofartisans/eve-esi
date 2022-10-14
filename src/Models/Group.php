@@ -3,9 +3,17 @@
 namespace Clanofartisans\EveEsi\Models;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class Group extends ESIModel
 {
+    /**
+     * The string to use for caching this model.
+     *
+     * @var string
+     */
+    protected static string $cacheKey = 'esi_groups';
+
     /**
      * The primary key for the model.
      *
@@ -19,6 +27,36 @@ class Group extends ESIModel
      * @var string
      */
     protected $table = 'esi_groups';
+
+    public static function cBPGroups()
+    {
+        $key = static::$cacheKey.':cBPGroups';
+
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
+
+        $bpGroups = self::select('group_id')->where('category_id', 9)->where('published', 1)->pluck('group_id')->toArray();
+
+        Cache::forever($key, $bpGroups);
+
+        return $bpGroups;
+    }
+
+    public static function cRelicGroups()
+    {
+        $key = static::$cacheKey.':cRelicGroups';
+
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
+
+        $relicGroups = self::select('group_id')->where('category_id', 34)->where('published', 1)->pluck('group_id')->toArray();
+
+        Cache::forever($key, $relicGroups);
+
+        return $relicGroups;
+    }
 
     /**
      * Creates a record, or updates an existing record, from JSON data.

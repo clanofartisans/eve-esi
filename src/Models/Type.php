@@ -3,9 +3,17 @@
 namespace Clanofartisans\EveEsi\Models;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class Type extends ESIModel
 {
+    /**
+     * The string to use for caching this model.
+     *
+     * @var string
+     */
+    protected static string $cacheKey = 'esi_types';
+
     /**
      * The primary key for the model.
      *
@@ -19,6 +27,30 @@ class Type extends ESIModel
      * @var string
      */
     protected $table = 'esi_types';
+
+    public function cBreadcrumbs()
+    {
+        $key = static::$cacheKey.':cBreadcrumbs:'.$this->type_id;
+
+        if(Cache::has($key)) {
+            return Cache::get($key);
+        }
+
+        $i = 0;
+
+        $breadcrumbs[$i] = MarketGroup::select('market_group_id', 'parent_group_id', 'name')->findOrFail($this->market_group_id)->toArray();
+
+        while(!empty($breadcrumbs[$i]['parent_group_id'])) {
+            $breadcrumbs[$i+1] = MarketGroup::select('market_group_id', 'parent_group_id', 'name')->findOrFail($breadcrumbs[$i]['parent_group_id'])->toArray();
+            $i++;
+        }
+
+        $breadcrumbs = array_reverse($breadcrumbs, true);
+
+        Cache::forever($key, $breadcrumbs);
+
+        return $breadcrumbs;
+    }
 
     /**
      * Creates a record, or updates an existing record, from JSON data.
