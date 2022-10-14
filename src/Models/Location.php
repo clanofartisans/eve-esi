@@ -25,7 +25,7 @@ class Location extends Model
      *
      * @var string
      */
-    protected $table = 'locations';
+    protected $table = 'yams_locations';
 
     /**
      * Indicates if the model should be timestamped.

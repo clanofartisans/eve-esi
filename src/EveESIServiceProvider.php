@@ -79,7 +79,8 @@ class EveESIServiceProvider extends ServiceProvider
         // Registering package commands.
         $this->commands([
             \Clanofartisans\EveEsi\Commands\ESIOrders::class,
-            \Clanofartisans\EveEsi\Commands\ESIUpdate::class
+            \Clanofartisans\EveEsi\Commands\ESIUpdate::class,
+            \Clanofartisans\EveEsi\Commands\YamsUpdate::class
         ]);
     }
 }

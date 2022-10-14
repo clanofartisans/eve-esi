@@ -2,7 +2,6 @@
 
 namespace Clanofartisans\EveEsi\Commands;
 
-use Clanofartisans\EveEsi\Jobs\DenormalizeLocations;
 use Clanofartisans\EveEsi\Jobs\ESIUpdate as ESIUpdateJob;
 use Clanofartisans\EveEsi\Jobs\Handlers\Ancestries;
 use Clanofartisans\EveEsi\Jobs\Handlers\Categories;
@@ -35,37 +34,39 @@ class ESIUpdate extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
-    public function handle(): void
+    public function handle(): int
     {
-        match ($this->argument('table')) {
-            'ancestries' =>
-                ESIUpdateJob::dispatch(Ancestries::class),
-            'categories' =>
-                ESIUpdateJob::dispatch(Categories::class),
-            'constellations' =>
-                ESIUpdateJob::dispatch(Constellations::class),
-            'groups' =>
-                ESIUpdateJob::dispatch(Groups::class),
-            'locations' =>
-                DenormalizeLocations::dispatch(),
-            'market_groups' =>
-                ESIUpdateJob::dispatch(MarketGroups::class),
-            'regions' =>
-                ESIUpdateJob::dispatch(Regions::class),
-            'stations' =>
-                ESIUpdateJob::dispatch(Stations::class),
-            'structures' =>
-                ESIUpdateJob::dispatch(Structures::class),
-            'systems' =>
-                ESIUpdateJob::dispatch(Systems::class),
-            'types' =>
-                ESIUpdateJob::dispatch(Types::class),
-            default =>
-                [$this->error('Table not found!'), die()],
-        };
+        try {
+            match ($this->argument('table')) {
+                'ancestries' =>
+                    ESIUpdateJob::dispatch(Ancestries::class),
+                'categories' =>
+                    ESIUpdateJob::dispatch(Categories::class),
+                'constellations' =>
+                    ESIUpdateJob::dispatch(Constellations::class),
+                'groups' =>
+                    ESIUpdateJob::dispatch(Groups::class),
+                'market_groups' =>
+                    ESIUpdateJob::dispatch(MarketGroups::class),
+                'regions' =>
+                    ESIUpdateJob::dispatch(Regions::class),
+                'stations' =>
+                    ESIUpdateJob::dispatch(Stations::class),
+                'structures' =>
+                    ESIUpdateJob::dispatch(Structures::class),
+                'systems' =>
+                    ESIUpdateJob::dispatch(Systems::class),
+                'types' =>
+                    ESIUpdateJob::dispatch(Types::class)
+            };
+        } catch (\UnhandledMatchError $e) {
+            $this->error('Table not found!');
+            return Command::INVALID;
+        }
 
         $this->info('Update queued successfully!');
+        return Command::SUCCESS;
     }
 }

@@ -25,12 +25,14 @@ class ESIOrders extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      */
-    public function handle(): void
+    public function handle(): int
     {
         ESIUpdate::dispatch(MarketOrders::class, $this->argument('region'));
 
         $this->info('Update queued successfully!');
+
+        return Command::SUCCESS;
     }
 }

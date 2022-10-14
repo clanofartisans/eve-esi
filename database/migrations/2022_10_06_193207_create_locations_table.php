@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('locations', function (Blueprint $table) {
+        Schema::create('yams_locations', function (Blueprint $table) {
             $table->unsignedBigInteger('region_id');
             $table->string('region_name');
             $table->unsignedBigInteger('system_id');
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('locations');
+        Schema::dropIfExists('yams_locations');
     }
 };
