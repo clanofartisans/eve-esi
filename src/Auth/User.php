@@ -2,27 +2,37 @@
 
 namespace Clanofartisans\EveEsi\Auth;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\Http;
 
 /**
  * @property string $token
  */
-class ESIAuth extends Model
+class User extends Authenticatable
 {
     /**
-     * The attributes that aren't mass assignable.
+     * The attributes that are mass assignable.
      *
-     * @var array
+     * @var array<int, string>
      */
-    protected $guarded = [];
+    protected $fillable = [
+        'character_id',
+        'character_owner_hash',
+        'character_name',
+        'token',
+        'refreshToken',
+        'expiresIn'
+    ];
 
     /**
-     * The table associated with the model.
+     * The attributes that should be hidden for serialization.
      *
-     * @var string
+     * @var array<string>
      */
-    protected $table = 'esi_auth';
+    protected $hidden = [
+        'token',
+        'refreshToken'
+    ];
 
     /**
      * The ESI URI where auth tokens are refreshed.
@@ -30,6 +40,13 @@ class ESIAuth extends Model
      * @var string
      */
     protected string $refreshURI = 'https://login.eveonline.com/v2/oauth/token';
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'yams_users';
 
     /**
      * Refreshes the auth token for the configured character.

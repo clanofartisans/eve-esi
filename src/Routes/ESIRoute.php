@@ -2,22 +2,21 @@
 
 namespace Clanofartisans\EveEsi\Routes;
 
-use Clanofartisans\EveEsi\Auth\ESIAuth;
 use Clanofartisans\EveEsi\Auth\RefreshTokenException;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redis;
+use Clanofartisans\EveEsi\Auth\User;
 
 abstract class ESIRoute
 {
     /**
      * The current auth instance that will be used for the request, if applicable.
      *
-     * @var ESIAuth
+     * @var User
      */
-    protected Model $auth;
+    protected User $auth;
 
     /**
      * The base ESI URI where API calls will be made.
@@ -47,7 +46,7 @@ abstract class ESIRoute
      */
     public function auth(): ESIRoute
     {
-        $auth = ESIAuth::where('character_id', config('eve-esi.auth_character_id'))->firstOrFail();
+        $auth = User::where('character_id', config('eve-esi.auth_character_id'))->firstOrFail();
 
         $this->auth = $auth;
 
