@@ -49,6 +49,19 @@ class User extends Authenticatable
     protected $table = 'yams_users';
 
     /**
+     * Create a new Eloquent model instance.
+     *
+     * @param  array  $attributes
+     * @return void
+     */
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct();
+
+        $this->table = config('eve-esi.auth_table');
+    }
+
+    /**
      * Refreshes the auth token for the configured character.
      *
      * @return bool

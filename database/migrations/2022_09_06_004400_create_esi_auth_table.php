@@ -21,6 +21,7 @@ return new class extends Migration
             $table->text('token');
             $table->string('refreshToken');
             $table->unsignedSmallInteger('expiresIn');
+            $table->rememberToken();
             $table->timestamps();
         });
     }

@@ -42,11 +42,16 @@ abstract class ESIRoute
     /**
      * Adds the current auth instance to the request.
      *
+     * @param int $characterID
      * @return ESIRoute $this
      */
-    public function auth(): ESIRoute
+    public function auth(int $characterID = 0): ESIRoute
     {
-        $auth = User::where('character_id', config('eve-esi.auth_character_id'))->firstOrFail();
+        if($characterID === 0) {
+            $characterID = config('eve-esi.auth_character_id');
+        }
+
+        $auth = User::where('character_id', $characterID)->firstOrFail();
 
         $this->auth = $auth;
 

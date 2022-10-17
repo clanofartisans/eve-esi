@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('character_id');
             $table->string('character_owner_hash');
             $table->string('character_name');
+            $table->string('current_system')->nullable();
             $table->text('token');
             $table->string('refreshToken');
             $table->unsignedSmallInteger('expiresIn');

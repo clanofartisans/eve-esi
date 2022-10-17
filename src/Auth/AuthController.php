@@ -12,7 +12,7 @@ class AuthController extends Controller
 {
     public function redirect(): RedirectResponse
     {
-        $scopes = config('eve-esi.scopes');
+        $scopes = config('eve-esi.scopes.sso');
 
         session(['pre-auth' => session()->previousUrl()]);
 
