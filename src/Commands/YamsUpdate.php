@@ -3,6 +3,7 @@
 namespace Clanofartisans\EveEsi\Commands;
 
 use Clanofartisans\EveEsi\Jobs\DenormalizeLocations;
+use Clanofartisans\EveEsi\Jobs\GetCharacterLocations;
 use Illuminate\Console\Command;
 
 class YamsUpdate extends Command
@@ -30,6 +31,8 @@ class YamsUpdate extends Command
     {
         try {
             match ($this->argument('table')) {
+                'character_locations' =>
+                    GetCharacterLocations::dispatch(),
                 'locations' =>
                     DenormalizeLocations::dispatch(),
             };

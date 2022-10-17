@@ -5,6 +5,7 @@ namespace Clanofartisans\EveEsi\Facades;
 use Illuminate\Support\Facades\Facade;
 
 /**
+ * @method static \Clanofartisans\EveEsi\Routes\Characters characters()
  * @method static \Clanofartisans\EveEsi\Routes\Markets markets()
  * @method static \Clanofartisans\EveEsi\Routes\Universe universe()
  */

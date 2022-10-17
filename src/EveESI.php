@@ -2,11 +2,22 @@
 
 namespace Clanofartisans\EveEsi;
 
+use Clanofartisans\EveEsi\Routes\Characters;
 use Clanofartisans\EveEsi\Routes\Markets;
 use Clanofartisans\EveEsi\Routes\Universe;
 
 class EveESI
 {
+    /**
+     * Handles "/characters" endpoints.
+     *
+     * @return Characters
+     */
+    public static function characters(): Characters
+    {
+        return new Characters;
+    }
+
     /**
      * Handles "/markets" endpoints.
      *
