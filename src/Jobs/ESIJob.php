@@ -20,18 +20,18 @@ abstract class ESIJob implements ShouldQueue
     public int $backoff = 5;
 
     /**
-     * The number of times the job may be attempted.
-     *
-     * @var int
-     */
-    public int $tries = 3;
-
-    /**
      * The number of seconds the job can run before timing out.
      *
      * @var int
      */
     public int $timeout = 300;
+
+    /**
+     * The number of times the job may be attempted.
+     *
+     * @var int
+     */
+    public int $tries = 3;
 
     /**
      * Process the job.
