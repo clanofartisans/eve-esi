@@ -12,6 +12,7 @@
     "homepage": "https://github.com/clanofartisans/eve-esi",
     "keywords": ["Laravel"],
     "require": {
+        "fisharebest/algorithm": "^1.6",
         "illuminate/support": "~9",
         "socialiteproviders/eveonline": "^4.2"
     },

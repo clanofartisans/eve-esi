@@ -169,6 +169,44 @@ class Universe extends ESIRoute
     }
 
     /**
+     * Begins the /universe/stargates path.
+     *
+     * @return Universe $this
+     */
+    public function stargates(): Universe
+    {
+        $this->route = 'universe.stargates';
+
+        return $this;
+    }
+
+    /**
+     * Calls the appropriate /{stargate_id} endpoint.
+     *
+     * @param int $stargateID
+     * @return Universe $this
+     */
+    public function stargate(int $stargateID): Universe
+    {
+        return $this->stargatesStargate($stargateID);
+    }
+
+    /**
+     * Handles the /universe/stargates/{stargate_id} path.
+     *
+     * @param int $stargateID
+     * @return Universe $this
+     */
+    protected function stargatesStargate(int $stargateID): Universe
+    {
+        $this->route = 'universe.stargates.stargate';
+
+        $this->parameters['path']['stargate_id'] = $stargateID;
+
+        return $this;
+    }
+
+    /**
      * Begins the /universe/stations path.
      *
      * @return Universe $this
@@ -346,6 +384,8 @@ class Universe extends ESIRoute
                 '/universe/regions',
             'universe.regions.region' =>
                 '/universe/regions/' . $this->parameters['path']['region_id'],
+            'universe.stargates.stargate' =>
+                '/universe/stargates/' . $this->parameters['path']['stargate_id'],
             'universe.stations.station' =>
                 '/universe/stations/' . $this->parameters['path']['station_id'],
             'universe.structures' =>

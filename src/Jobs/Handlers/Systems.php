@@ -6,6 +6,7 @@ use Clanofartisans\EveEsi\Facades\EveESI as ESI;
 use Clanofartisans\EveEsi\Jobs\Handlers\Concerns\HasIndex;
 use Clanofartisans\EveEsi\Models\Constellation;
 use Clanofartisans\EveEsi\Models\ESITableUpdates;
+use Clanofartisans\EveEsi\Models\Stargate;
 use Clanofartisans\EveEsi\Models\Station;
 use Clanofartisans\EveEsi\Models\System;
 use Clanofartisans\EveEsi\Routes\ESIRoute;
@@ -44,6 +45,7 @@ class Systems extends ESIHandler
      */
     public function specialData(string $section): void
     {
+        $this->specialPopulateStargateIDs();
         $this->specialPopulateStationIDs();
         $this->specialSetRegionIDs();
         $this->clearTableUpdates();
@@ -87,6 +89,27 @@ class Systems extends ESIHandler
     protected function resourceRoute(int $id): ESIRoute
     {
         return ESI::universe()->systems()->system($id);
+    }
+
+    /**
+     * Retrieves Station IDs from the current System data and adds them to the Stations table.
+     *
+     * @return void
+     */
+    protected function specialPopulateStargateIDs(): void
+    {
+        $updates = ESITableUpdates::where('table', $this->updateTable)
+            ->where('section', $this->section)
+            ->lazy();
+
+        foreach($updates as $update) {
+            $stargates = Arr::exists($update->data, 'stargates') ? $update->data['stargates'] : [];
+            foreach ($stargates as $stargate) {
+                Stargate::insertOrIgnore([
+                    'stargate_id' => $stargate
+                ]);
+            }
+        }
     }
 
     /**
